@@ -1,0 +1,96 @@
+
+### Visual Studio 生成文件 ###
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userprefs
+*.vs/
+*.vspx
+*.psess
+*.ncrunchsolution
+*.DotSettings
+*.DotSettings.user
+
+### 编译输出 ###
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+### NuGet 包 ###
+.nuget/
+*.nupkg
+packages/
+NuGet.exe
+nuget.config
+
+### 项目特定文件 ###
+*.resharper
+*.ReSharper
+*.sln.iml
+*.csproj.user
+*.vbproj.user
+*.fsproj.user
+*.dbmdl
+*.jfm
+
+### 用户特定文件 ###
+[Tt]humbs.db
+[Dd]esktop.ini
+$tf/
+
+### 测试结果 ###
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.testsettings
+*.trx
+
+### 敏感文件 ###
+*.pfx
+*.p12
+*.cer
+*.key
+*.keystore
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+connectionstrings.*.json
+
+### IDE 文件 ###
+.idea/
+.vscode/
+.fleet/
+.history/
+
+### 其他 ###
+*.cache
+*.log
+*.bak
+*.tmp
+*.swp
+*.swo
+*~
+~$*
+*.orig
+*.patch
+*.diff
+_ReSharper.*
+*.dotCover
+*.sass-cache/
+[Tt]emp/
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+*.DS_Store
+

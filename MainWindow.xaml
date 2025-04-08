@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window x:Class="PlcCommunicator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PlcCommunicator"
+        xmlns:prism="http://prismlibrary.com/"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        mc:Ignorable="d"
+        Title="通信服务器" Height="600" Width="1000"
+        WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 顶部导航栏 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#F0F0F0">
+            <Button Content="服务器配置" Margin="5" Padding="10,5" Name="ServerConfigButton"/>
+            <Button Content="数据管理" Margin="5" Padding="10,5" Name="DataManagementButton"/>
+            <Button Content="客户端监控" Margin="5" Padding="10,5" Name="ClientMonitorButton"/>
+        </StackPanel>
+
+        <!-- 主内容区域 -->
+        <ContentControl Grid.Row="1" prism:RegionManager.RegionName="ContentRegion"/>
+    </Grid>
+</Window>
