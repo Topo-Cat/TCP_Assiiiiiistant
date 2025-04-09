@@ -1,3 +1,5 @@
+**2025/04/10 完成启动服务功能**
+
 # PlcCommunicator
 
 PlcCommunicator 是一个基于 C# WPF 开发的 ModBus TCP 通信模拟器，采用 MVVM 架构模式设计。该工具可以模拟 ModBus TCP 服务器，用于工业自动化测试和开发环境中的通信调试。
