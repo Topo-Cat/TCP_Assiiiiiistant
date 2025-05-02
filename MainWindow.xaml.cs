@@ -24,7 +24,21 @@ namespace PlcCommunicator
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _navigationService.NavigateTo("ModBusTCPServicePage", false);
+            //Application.Current?.Dispatcher?.BeginInvoke(() =>
+            //{
+            //    _navigationService.NavigateTo("ModBusTCPClosedLoopPage", false);
+            //}
+            //);
+
+        }
+
+        private void ClientMonitorButton_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current?.Dispatcher?.BeginInvoke(() =>
+            {
+                _navigationService.NavigateTo("ModBusTCPClosedLoopPage", false);
+            }
+);
         }
     }
 }

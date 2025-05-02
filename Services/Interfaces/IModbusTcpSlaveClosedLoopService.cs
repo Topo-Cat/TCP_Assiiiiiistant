@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace PlcCommunicator.Services.Interfaces
 {
-    public interface IModBusTCPService
+    public interface IModbusTcpSlaveClosedLoopService
     {
-        Task StartServiceAsync(int port, byte slaveId); //启动TCP服务
+        Task StartServiceAsync(); //启动TCP服务
         Task StopServiceAsync(); //停止TCP服务
         bool IsServiceRunning(); //服务是否正在运行
 
@@ -28,7 +28,6 @@ namespace PlcCommunicator.Services.Interfaces
         Task FillCoilsAsync(ushort address, ushort count, bool value); //写入多个线圈
 
         int ConnectionCount(); //当前连接客户端的数量
-        ConcurrentDictionary<string, ClientInfo> ConnectedClients { get; } //当前连接的客户端信息
         Task DisconnectClientAsync(string clientId);
 
         void ClearAllData(); //复位所有寄存器和线圈

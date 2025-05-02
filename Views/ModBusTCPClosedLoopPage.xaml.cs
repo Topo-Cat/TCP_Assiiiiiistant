@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace PlcCommunicator.Views
 {
     /// <summary>
-    /// ModBusTCPServicePage.xaml 的交互逻辑
+    /// ModBusTCPClosedLoopPage.xaml 的交互逻辑
     /// </summary>
-    public partial class ModBusTCPServicePage : UserControl
+    public partial class ModBusTCPClosedLoopPage : UserControl
     {
-        public ModBusTCPServicePage()
+        public ModBusTCPClosedLoopPage()
         {
             InitializeComponent();
         }

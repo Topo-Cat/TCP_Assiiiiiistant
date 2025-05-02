@@ -1,4 +1,9 @@
+using PlcCommunicator.ViewModels;
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Input;
 
 namespace PlcCommunicator.Commands
@@ -6,129 +11,264 @@ namespace PlcCommunicator.Commands
     /// <summary>
     /// 实现ICommand接口的命令类，用于MVVM模式中的命令绑定
     /// </summary>
-    public class RelayCommand : ICommand
+    public class RelayCommand : ICommand, IAsyncCommand, INotifyPropertyChanged
     {
-        private readonly Action _execute;
-        private readonly Func<bool> _canExecute;
-
-        /// <summary>
-        /// 创建一个始终可以执行的命令
-        /// </summary>
-        /// <param name="execute">命令要执行的操作</param>
-        public RelayCommand(Action execute) : this(execute, null)
+        private readonly object _syncLock = new();
+        private readonly object _eventLock = new();
+        private volatile bool _isExecuting;
+        public bool IsExecuting
         {
+            get => _isExecuting;
+            private set
+            {
+                bool isChanged = false;
+
+                lock (_syncLock)
+                {
+                    if (_isExecuting != value)
+                    {
+                        _isExecuting = value;
+                        isChanged = true;
+                    }
+                }
+
+                if (isChanged)
+                    OnPropertyChanged();
+                RaiseCanExecuteChangedInternal();
+            }
         }
 
-        /// <summary>
-        /// 创建一个可以根据条件执行的命令
-        /// </summary>
-        /// <param name="execute">命令要执行的操作</param>
-        /// <param name="canExecute">决定命令是否可以执行的函数</param>
-        public RelayCommand(Action execute, Func<bool> canExecute)
+        private readonly Action<object?>? _executeSync;
+
+        private readonly Func<object?, Task>? _executeAsync;
+        private readonly Func<object?, CancellationToken, Task>? _executeAsyncWithToken;
+
+        private readonly Func<object?, bool>? _canExecute;
+
+        private event PropertyChangedEventHandler? _propertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged
         {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
+            add { lock (_eventLock) { _propertyChanged += value; } }
+            remove { lock (_eventLock) { _propertyChanged -= value; } }
         }
 
-        /// <summary>
-        /// 当命令的可执行状态发生改变时触发
-        /// </summary>
-        public event EventHandler CanExecuteChanged
+        private void OnPropertyChanged([CallerMemberName] string? propertyname = null)
+        {
+            PropertyChangedEventHandler? handler;
+
+            lock (_eventLock)
+            {
+                handler = _propertyChanged;
+            }
+
+            if (handler == null) return;
+
+            if (Application.Current?.Dispatcher?.CheckAccess() ?? true)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyname));
+            }
+            else
+            {
+                Application.Current?.Dispatcher?.Invoke(() => handler(this, new PropertyChangedEventArgs(propertyname)));
+            }
+        }
+
+        public event EventHandler? CanExecuteChanged
         {
             add { CommandManager.RequerySuggested += value; }
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        /// <summary>
-        /// 判断命令是否可以执行
-        /// </summary>
-        /// <param name="parameter">命令参数（本实现中未使用）</param>
-        /// <returns>如果命令可以执行则返回true，否则返回false</returns>
-        public bool CanExecute(object parameter)
-        {
-            return _canExecute == null || _canExecute();
-        }
+        public RelayCommand(Action execute, Func<bool>? canExecute = null) : this(WrapSyncAction(execute), WrapCanExecute(canExecute)) { }
 
-        /// <summary>
-        /// 执行命令
-        /// </summary>
-        /// <param name="parameter">命令参数（本实现中未使用）</param>
-        public void Execute(object parameter)
-        {
-            _execute();
-        }
+        public RelayCommand(Action<object?>? execute, Func<bool>? canExecute = null) : this(execute, WrapCanExecute(canExecute)) { }
 
-        /// <summary>
-        /// 手动触发命令可执行状态的重新评估
-        /// </summary>
-        public void RaiseCanExecuteChanged()
-        {
-            CommandManager.InvalidateRequerySuggested();
-        }
-    }
+        public RelayCommand(Action execute, Func<object?, bool>? canExecute = null) : this(WrapSyncAction(execute), canExecute) { }
 
-    /// <summary>
-    /// 带参数的RelayCommand实现
-    /// </summary>
-    /// <typeparam name="T">命令参数的类型</typeparam>
-    public class RelayCommand<T> : ICommand
-    {
-        private readonly Action<T> _execute;
-        private readonly Predicate<T> _canExecute;
-
-        /// <summary>
-        /// 创建一个始终可以执行的带参数的命令
-        /// </summary>
-        /// <param name="execute">命令要执行的操作</param>
-        public RelayCommand(Action<T> execute) : this(execute, null)
+        public RelayCommand(Action<object?>? execute, Func<object?, bool>? canExecute = null)
         {
-        }
-
-        /// <summary>
-        /// 创建一个可以根据条件执行的带参数的命令
-        /// </summary>
-        /// <param name="execute">命令要执行的操作</param>
-        /// <param name="canExecute">决定命令是否可以执行的函数</param>
-        public RelayCommand(Action<T> execute, Predicate<T> canExecute)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _executeSync = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
+            ValidateConstructor();
         }
 
-        /// <summary>
-        /// 当命令的可执行状态发生改变时触发
-        /// </summary>
-        public event EventHandler CanExecuteChanged
+        public RelayCommand(Func<Task> executeAsync, Func<bool>? canExecute = null) : this(WrapAsyncFunc(executeAsync), WrapCanExecute(canExecute)) { }
+
+        public RelayCommand(Func<object?, Task> executeAsync, Func<bool>? canExecute = null) : this(executeAsync, WrapCanExecute(canExecute)) { }
+
+        public RelayCommand(Func<Task> executeAsync, Func<object?, bool>? canExecute) : this(WrapAsyncFunc(executeAsync), canExecute) { }
+
+        public RelayCommand(Func<object?, Task> executeAsync, Func<object?, bool>? canExecute = null)
         {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
+            _executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
+            _canExecute = canExecute;
+            ValidateConstructor();
         }
 
-        /// <summary>
-        /// 判断命令是否可以执行
-        /// </summary>
-        /// <param name="parameter">命令参数</param>
-        /// <returns>如果命令可以执行则返回true，否则返回false</returns>
-        public bool CanExecute(object parameter)
+        public RelayCommand(Func<CancellationToken, Task> executeAsync, Func<bool>? canExecute = null) : this(WrapAsyncFuncWithToken(executeAsync), WrapCanExecute(canExecute)) { }
+
+        public RelayCommand(Func<object?, CancellationToken, Task> executeAsync, Func<bool>? canExecute = null) : this(executeAsync, WrapCanExecute(canExecute)) { }
+
+        public RelayCommand(Func<CancellationToken, Task> executeAsync, Func<object?, bool>? canExecute = null) : this(WrapAsyncFuncWithToken(executeAsync), canExecute) { }
+
+        public RelayCommand(Func<object?, CancellationToken, Task> executeAsync, Func<object?, bool>? canExecute = null)
         {
-            return _canExecute == null || _canExecute((T)parameter);
+            _executeAsyncWithToken = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
+            _canExecute = canExecute;
+            ValidateConstructor();
         }
 
-        /// <summary>
-        /// 执行命令
-        /// </summary>
-        /// <param name="parameter">命令参数</param>
-        public void Execute(object parameter)
+        private async Task ExecuteAsyncInternal(object? parameter, CancellationToken cancellationToken, bool forceFireAndForget)
         {
-            _execute((T)parameter);
+            bool acquiredExecution = false;
+            lock (_syncLock)
+            {
+                if (!_isExecuting && CanExecute(parameter))
+                {
+                    _isExecuting = true;
+                    acquiredExecution = true;
+                }
+            }
+
+            if (!acquiredExecution)
+            {
+                return;
+            }
+
+            try
+            {
+                Task? executionTask = null;
+
+                if (_executeSync != null)
+                {
+                    _executeSync(parameter);
+                    executionTask = Task.CompletedTask;
+                }
+                else if (_executeAsyncWithToken != null)
+                {
+                    executionTask = _executeAsyncWithToken(parameter, cancellationToken);
+                }
+                else if (_executeAsync != null)
+                {
+                    executionTask = _executeAsync(parameter);
+                }
+                else
+                {
+                    throw new InvalidOperationException("未找到执行委托。");
+                }
+
+                if (!forceFireAndForget && executionTask != null)
+                {
+                    await executionTask;
+                }
+                else if (forceFireAndForget && executionTask != null)
+                {
+                    _ = executionTask.ContinueWith(t =>
+                    {
+                        if (t.IsFaulted && t.Exception != null)
+                        {
+                            Debug.WriteLine($"[RelayCommand 即发即忘错误]: {t.Exception}");
+                        }
+                    }, TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.WriteLine("[RelayCommand]: 操作已取消。");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[RelayCommand 执行错误]: {ex}");
+
+                if (_executeSync != null || !forceFireAndForget)
+                {
+                    throw;
+                }
+            }
+            finally
+            {
+                if (acquiredExecution)// 仅当成功获取执行权时才释放执行标志位
+                {
+                    _isExecuting = false;
+                }
+            }
         }
 
-        /// <summary>
-        /// 手动触发命令可执行状态的重新评估
-        /// </summary>
-        public void RaiseCanExecuteChanged()
+        public void RaiseCanExecuteChanged()// 公开的 RaiseCanExecuteChanged 方法，用于外部调用
+        {
+            RaiseCanExecuteChangedInternal();
+        }
+
+        private void RaiseCanExecuteChangedInternal()
         {
             CommandManager.InvalidateRequerySuggested();
+        }
+
+        private static Action<object?> WrapSyncAction(Action action)// 用于构造函数的execute辅助包装器
+        {
+            ArgumentNullException.ThrowIfNull(action);
+            return _ => action();// 忽略参数
+        }
+
+        private static Func<object?, bool>? WrapCanExecute(Func<bool>? canExecute)// 用于构造函数的canexecute辅助包装器
+        {
+            if (canExecute == null) return null;
+            return _ => canExecute(); // 忽略参数
+        }
+
+        private static Func<object?, Task> WrapAsyncFunc(Func<Task> func)
+        {
+            ArgumentNullException.ThrowIfNull(func);
+            return _ => func();
+        }
+
+        private static Func<object?, CancellationToken, Task> WrapAsyncFuncWithToken(Func<CancellationToken, Task> func)
+        {
+            ArgumentNullException.ThrowIfNull(func);
+            return (_, token) => func(token);
+        }
+
+        private void ValidateConstructor() // 构造函数验证，确保只有一个执行委托被提供
+        {
+            int delegateCount = (_executeSync != null ? 1 : 0) +
+                                (_executeAsync != null ? 1 : 0) +
+                                (_executeAsyncWithToken != null ? 1 : 0);
+            if (delegateCount != 1)
+            {
+                throw new InvalidOperationException("RelayCommand 必须有且只有一个执行委托。");
+            }
+        }
+
+        public void Execute(object? parameter)
+        {
+            _ = ExecuteAsyncInternal(parameter, CancellationToken.None, true);
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            if (_isExecuting)
+            {
+                return false;
+            }
+            try
+            {
+                return _canExecute?.Invoke(parameter) ?? true;
+            }
+            catch
+            {
+                Debug.WriteLine("Canexecute执行出错！");
+                return false;
+            }
+        }
+
+        public Task ExecuteAsync(object? parameter)
+        {
+            return ExecuteAsyncInternal(parameter, CancellationToken.None, false);
+        }
+
+        public Task ExecuteAsync(object? parameter, CancellationToken cancellationToken)
+        {
+            return ExecuteAsyncInternal(parameter, cancellationToken, false);
         }
     }
 }

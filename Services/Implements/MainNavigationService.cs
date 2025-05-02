@@ -22,7 +22,7 @@ namespace PlcCommunicator.Services.Implements
             _pages = new Dictionary<string, Type>()
             {   { "ClientMonitor", typeof(ClientMonitor) },
                 { "DataManagement", typeof(DataManagement) },
-                { "ModBusTCPServicePage", typeof(ModBusTCPServicePage) }
+                { "ModBusTCPClosedLoopPage", typeof(ModBusTCPClosedLoopPage) }
             };
             _regionManager = regionManager;
             _navigationService = new Lazy<IRegionNavigationService>(
