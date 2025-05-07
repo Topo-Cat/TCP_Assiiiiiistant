@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NModbus;
 using NModbus.Data;
 using NModbus.Logging;
-using PlcCommunicator.Events.PrismEventAggregator;
-using PlcCommunicator.Models;
-using PlcCommunicator.Services.Configuration;
-using PlcCommunicator.Services.Interfaces;
-using PlcCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices;
+using ModbusCommunicator.Events.PrismEventAggregator;
+using ModbusCommunicator.Models;
+using ModbusCommunicator.Services.Configuration;
+using ModbusCommunicator.Services.Interfaces;
+using ModbusCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices;
 using Polly;
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PlcCommunicator.Services.Implements
+namespace ModbusCommunicator.Services.Implements
 {
     public class ModbusTcpMasterClosedLoopService : IModbusTcpMasterClosedLoopService
     {

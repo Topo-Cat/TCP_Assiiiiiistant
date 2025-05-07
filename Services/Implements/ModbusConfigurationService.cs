@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using PlcCommunicator.Events.PrismEventAggregator;
-using PlcCommunicator.Services.Configuration;
-using PlcCommunicator.Services.Interfaces;
+using ModbusCommunicator.Events.PrismEventAggregator;
+using ModbusCommunicator.Services.Configuration;
+using ModbusCommunicator.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlcCommunicator.Services.Implements
+namespace ModbusCommunicator.Services.Implements
 {
     public class ModbusConfigurationService : IModbusTcpConfigurationService
     {

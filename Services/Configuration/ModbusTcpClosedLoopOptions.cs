@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace PlcCommunicator.Services.Configuration
+namespace ModbusCommunicator.Services.Configuration
 {
     /// <summary>
     /// 包含 Modbus TCP 从站（服务）配置选项的类。

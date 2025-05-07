@@ -1,4 +1,4 @@
-using PlcCommunicator.ViewModels;
+using ModbusCommunicator.ViewModels;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 
-namespace PlcCommunicator.Commands
+namespace ModbusCommunicator.Commands
 {
     /// <summary>
     /// 实现ICommand接口的命令类，用于MVVM模式中的命令绑定

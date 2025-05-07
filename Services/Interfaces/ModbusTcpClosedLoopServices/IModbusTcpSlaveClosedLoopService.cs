@@ -1,5 +1,5 @@
-﻿using PlcCommunicator.Events;
-using PlcCommunicator.Models;
+using ModbusCommunicator.Events;
+using ModbusCommunicator.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlcCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices
+namespace ModbusCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices
 {
     public interface IModbusTcpSlaveClosedLoopService
     {

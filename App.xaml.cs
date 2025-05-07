@@ -1,8 +1,8 @@
 using System.Windows;
 using System.IO;
-using PlcCommunicator.Services.Implements;
-using PlcCommunicator.Services.Interfaces;
-using PlcCommunicator.Views;
+using ModbusCommunicator.Services.Implements;
+using ModbusCommunicator.Services.Interfaces;
+using ModbusCommunicator.Views;
 using Prism.Ioc;
 using Prism.Modularity;
 using Microsoft.Extensions.Hosting;
@@ -10,11 +10,11 @@ using Prism.DryIoc;
 using NModbus.Logging;
 using NModbus;
 using Microsoft.Extensions.Logging;
-using PlcCommunicator.Services.Configuration;
+using ModbusCommunicator.Services.Configuration;
 using System.Diagnostics;
-using PlcCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices;
+using ModbusCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices;
 
-namespace PlcCommunicator;
+namespace ModbusCommunicator;
 
 /// <summary>
 /// Interaction logic for App.xaml
@@ -28,48 +28,48 @@ public partial class App : PrismApplication
 
     protected override void OnInitialized()
     {
-        base.OnInitialized(); // µ÷ÓÃ»ùÀà·½·¨
+        base.OnInitialized(); // è°ƒç”¨åŸºç±»æ–¹æ³•
 
-        Debug.WriteLine("--- ¿ªÊ¼ÊÖ¶¯½âÎö²âÊÔ ---");
+        Debug.WriteLine("--- å¼€å§‹æ‰‹åŠ¨è§£ææµ‹è¯• ---");
         try
         {
-            // 1. ³¢ÊÔ½âÎö ILoggerFactory ±¾Éí
-            Debug.WriteLine("³¢ÊÔ½âÎö ILoggerFactory...");
+            // 1. å°è¯•è§£æ ILoggerFactory æœ¬èº«
+            Debug.WriteLine("å°è¯•è§£æ ILoggerFactory...");
             var factory = Container.Resolve<ILoggerFactory>();
-            Debug.WriteLine($"ÊÖ¶¯½âÎö ILoggerFactory ³É¹¦! ÀàĞÍ: {factory?.GetType().FullName}");
+            Debug.WriteLine($"æ‰‹åŠ¨è§£æ ILoggerFactory æˆåŠŸ! ç±»å‹: {factory?.GetType().FullName}");
 
-            // 2. ³¢ÊÔÊ¹ÓÃÒÑ½âÎöµÄ Factory ´´½¨ Logger (Ä£ÄâÈİÆ÷ĞĞÎª)
+            // 2. å°è¯•ä½¿ç”¨å·²è§£æçš„ Factory åˆ›å»º Logger (æ¨¡æ‹Ÿå®¹å™¨è¡Œä¸º)
             if (factory != null)
             {
-                Debug.WriteLine("³¢ÊÔÊ¹ÓÃ Factory ´´½¨ ILogger<ModbusTcpClosedLoopOptions>...");
+                Debug.WriteLine("å°è¯•ä½¿ç”¨ Factory åˆ›å»º ILogger<ModbusTcpClosedLoopOptions>...");
                 var loggerManual = factory.CreateLogger<ModbusTcpClosedLoopOptions>();
-                Debug.WriteLine($"ÊÖ¶¯´´½¨ ILogger<ModbusTcpClosedLoopOptions> ³É¹¦! ÀàĞÍ: {loggerManual?.GetType().FullName}");
+                Debug.WriteLine($"æ‰‹åŠ¨åˆ›å»º ILogger<ModbusTcpClosedLoopOptions> æˆåŠŸ! ç±»å‹: {loggerManual?.GetType().FullName}");
             }
             else
             {
-                Debug.WriteLine("ÎŞ·¨»ñÈ¡ ILoggerFactory ÊµÀı£¬Ìø¹ıÊÖ¶¯´´½¨ Logger ²âÊÔ¡£");
+                Debug.WriteLine("æ— æ³•è·å– ILoggerFactory å®ä¾‹ï¼Œè·³è¿‡æ‰‹åŠ¨åˆ›å»º Logger æµ‹è¯•ã€‚");
             }
 
-            Debug.WriteLine("³¢ÊÔÈÃÈİÆ÷½âÎö ILogger<ModbusTcpClosedLoopOptions>...");
+            Debug.WriteLine("å°è¯•è®©å®¹å™¨è§£æ ILogger<ModbusTcpClosedLoopOptions>...");
             var loggerResolved = Container.Resolve<ILogger<ModbusTcpClosedLoopOptions>>();
-            Debug.WriteLine($"ÈİÆ÷½âÎö ILogger<ModbusTcpClosedLoopOptions> ³É¹¦! ÀàĞÍ: {loggerResolved?.GetType().FullName}");
+            Debug.WriteLine($"å®¹å™¨è§£æ ILogger<ModbusTcpClosedLoopOptions> æˆåŠŸ! ç±»å‹: {loggerResolved?.GetType().FullName}");
 
         }
         catch (Exception ex)
         {
-            // !!! ÕâÀï»á²¶»ñµ½ÈİÆ÷½âÎöÊ§°ÜÊ±µÄ¾ßÌåÒì³£ !!!
-            Debug.WriteLine($"!!! ÊÖ¶¯½âÎöÊ±·¢Éú´íÎó: {ex.GetType().FullName} !!!");
-            Debug.WriteLine($"´íÎóÏûÏ¢: {ex.Message}");
-            Debug.WriteLine($"¶ÑÕ»¸ú×Ù: {ex.StackTrace}"); // ÏêÏ¸µÄ¶ÑÕ»ĞÅÏ¢
+            // !!! è¿™é‡Œä¼šæ•è·åˆ°å®¹å™¨è§£æå¤±è´¥æ—¶çš„å…·ä½“å¼‚å¸¸ !!!
+            Debug.WriteLine($"!!! æ‰‹åŠ¨è§£ææ—¶å‘ç”Ÿé”™è¯¯: {ex.GetType().FullName} !!!");
+            Debug.WriteLine($"é”™è¯¯æ¶ˆæ¯: {ex.Message}");
+            Debug.WriteLine($"å †æ ˆè·Ÿè¸ª: {ex.StackTrace}"); // è¯¦ç»†çš„å †æ ˆä¿¡æ¯
             if (ex.InnerException != null)
             {
-                Debug.WriteLine($"--- ÄÚ²¿Òì³£ ---");
-                Debug.WriteLine($"ÄÚ²¿Òì³£ÀàĞÍ: {ex.InnerException.GetType().FullName}");
-                Debug.WriteLine($"ÄÚ²¿Òì³£ÏûÏ¢: {ex.InnerException.Message}");
-                Debug.WriteLine($"ÄÚ²¿Òì³£¶ÑÕ»: {ex.InnerException.StackTrace}");
+                Debug.WriteLine($"--- å†…éƒ¨å¼‚å¸¸ ---");
+                Debug.WriteLine($"å†…éƒ¨å¼‚å¸¸ç±»å‹: {ex.InnerException.GetType().FullName}");
+                Debug.WriteLine($"å†…éƒ¨å¼‚å¸¸æ¶ˆæ¯: {ex.InnerException.Message}");
+                Debug.WriteLine($"å†…éƒ¨å¼‚å¸¸å †æ ˆ: {ex.InnerException.StackTrace}");
             }
         }
-        Debug.WriteLine("--- ÊÖ¶¯½âÎö²âÊÔ½áÊø ---");
+        Debug.WriteLine("--- æ‰‹åŠ¨è§£ææµ‹è¯•ç»“æŸ ---");
     }
 
     protected override void RegisterTypes(IContainerRegistry containerRegistry)
@@ -85,7 +85,7 @@ public partial class App : PrismApplication
                 );
             }
             );
-        // 1. ×¢²á ILoggerFactory (ÄãÒÑÓĞµÄ´úÂë)
+        // 1. æ³¨å†Œ ILoggerFactory (ä½ å·²æœ‰çš„ä»£ç )
         containerRegistry.RegisterSingleton<ILoggerFactory>(() =>
             LoggerFactory.Create(builder =>
             {
@@ -93,20 +93,20 @@ public partial class App : PrismApplication
                 builder.SetMinimumLevel(LogLevel.Debug);
             }));
 
-        //// 2. !!! »ñÈ¡µ×²ãµÄ DryIoc ×¢²áÆ÷²¢µ÷ÓÃ RegisterDelegate !!!
-        //// »ñÈ¡ DryIoc µÄ IRegistrator ÊµÀı
-        //var registrator = containerRegistry.GetContainer(); // GetContainer() Í¨³£·µ»Ø¿ÉÓÃÓÚ×¢²áµÄµ×²ã¶ÔÏó
+        //// 2. !!! è·å–åº•å±‚çš„ DryIoc æ³¨å†Œå™¨å¹¶è°ƒç”¨ RegisterDelegate !!!
+        //// è·å– DryIoc çš„ IRegistrator å®ä¾‹
+        //var registrator = containerRegistry.GetContainer(); // GetContainer() é€šå¸¸è¿”å›å¯ç”¨äºæ³¨å†Œçš„åº•å±‚å¯¹è±¡
 
-        //// ÔÚ»ñÈ¡µ½µÄ DryIoc ×¢²áÆ÷ÉÏµ÷ÓÃ RegisterDelegate
+        //// åœ¨è·å–åˆ°çš„ DryIoc æ³¨å†Œå™¨ä¸Šè°ƒç”¨ RegisterDelegate
         //registrator.RegisterDelegate<ILogger<ModbusTcpClosedLoopOptions>>(
-        //    resolver => // resolver ÏÖÔÚÊÇ DryIoc µÄ IResolverContext
+        //    resolver => // resolver ç°åœ¨æ˜¯ DryIoc çš„ IResolverContext
         //    {
-        //        // ´ÓÈİÆ÷ÖĞ»ñÈ¡ÒÑ×¢²áµÄ ILoggerFactory
+        //        // ä»å®¹å™¨ä¸­è·å–å·²æ³¨å†Œçš„ ILoggerFactory
         //        var factory = resolver.Resolve<ILoggerFactory>();
-        //        // Ê¹ÓÃ¹¤³§´´½¨ËùĞèµÄ Logger ÊµÀı
+        //        // ä½¿ç”¨å·¥å‚åˆ›å»ºæ‰€éœ€çš„ Logger å®ä¾‹
         //        return factory.CreateLogger<ModbusTcpClosedLoopOptions>();
         //    },
-        //    reuse: Reuse.Singleton // Ã÷È·Ö¸¶¨Îª Singleton£¬Óë LoggerFactory ±£³ÖÒ»ÖÂ
+        //    reuse: Reuse.Singleton // æ˜ç¡®æŒ‡å®šä¸º Singletonï¼Œä¸ LoggerFactory ä¿æŒä¸€è‡´
         //);
 
         containerRegistry.RegisterSingleton<ILogger<ModbusTcpClosedLoopOptions>>(() =>

@@ -1,20 +1,36 @@
-**2025/04/10 更新：完成启动服务功能**
+**2023/11/15 更新：项目架构重构与模块化设计**
 
-# PlcCommunicator
+# ModbusCommunicator
 
-PlcCommunicator 是一个基于 C# WPF 开发的 ModBus TCP 通信模拟器，采用 MVVM 架构模式设计。该工具可以模拟 ModBus TCP 服务器，用于工业自动化测试和开发环境中的通信调试。
+ModbusCommunicator 是一个基于 C# WPF 开发的 ModBus TCP 通信模拟器，采用 MVVM 架构模式设计。该工具可以模拟 ModBus TCP 服务器，用于工业自动化测试和开发环境中的通信调试。
 
 ## 🚧 项目状态
 
-**注意：此项目尚未完成，正在开发中。**
+**当前版本：0.1.0-alpha**
 
-当前未完成的功能：
-- ModBus TCP 服务器核心功能实现
-- 客户端连接管理
-- 数据导出功能
-- 异常处理机制
-- 完整的日志系统
-- 用户界面优化
+### ✔️ 已完成功能
+- MVVM基础架构搭建
+- Prism模块化框架集成
+- 基础服务接口定义
+- 核心通信模块原型
+
+### 🔧 近期开发重点
+- ModBus TCP 服务器核心功能
+- 客户端连接管理基础
+- 基础日志系统实现
+- 核心模块单元测试
+
+
+### 🧩 模块化架构
+```mermaid
+graph TD
+    A[核心通信模块] --> B[服务管理模块]
+    A --> C[数据管理模块]
+    B --> D[监控诊断模块]
+    C --> D
+```
+
+
 
 ## ✨ 主要功能
 
@@ -41,22 +57,49 @@ PlcCommunicator 是一个基于 C# WPF 开发的 ModBus TCP 通信模拟器，�
 - .NET 8.0
 - WPF (Windows Presentation Foundation)
 - MVVM 架构模式
+- 模块化设计
 - NModbus 库
 - DryIoc (依赖注入容器)
 - Microsoft.Xaml.Behaviors
+- Prism框架 (模块化支持)
+
 
 ## 📦 项目结构
 
 ```
-PlcCommunicator/
-├── Commands/           # 命令实现
-├── Events/            # 事件定义
-├── Models/            # 数据模型
-├── Services/          # 服务层
-│   ├── Implements/    # 服务实现
-│   └── Interfaces/    # 服务接口
-├── ViewModels/        # 视图模型
-└── Views/             # 视图
+ModbusCommunicator/
+├── Core/               # 核心通信模块
+│   ├── Protocols/      # 协议实现
+│   ├── Networking/     # 网络通信
+│   └── Codecs/         # 数据编解码
+│
+├── Services/           # 服务管理模块
+│   ├── Lifecycle/      # 服务生命周期
+│   ├── ConnectionPool/ # 连接池管理
+│   └── Schedulers/     # 任务调度
+│
+├── Data/               # 数据管理模块  
+│   ├── Registers/      # 寄存器管理
+│   ├── Persistence/    # 数据持久化
+│   └── IO/             # 数据导入导出
+│
+├── Monitoring/         # 监控诊断模块
+│   ├── Logging/        # 日志系统
+│   ├── Diagnostics/    # 诊断工具
+│   └── Metrics/        # 性能统计
+│
+├── Infrastructure/     # 基础设施
+│   ├── Commands/       # 命令模式实现
+│   ├── Events/         # 事件系统
+│   └── Models/         # 基础数据模型
+│
+├── Presentation/       # 表现层
+│   ├── ViewModels/     # 视图模型
+│   └── Views/          # 视图组件
+│
+└── App/                # 应用核心
+    ├── Config/         # 应用配置
+    └── Bootstrap/      # 启动引导
 ```
 
 ## 🚀 开发环境要求

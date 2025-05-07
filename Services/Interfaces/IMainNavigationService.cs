@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlcCommunicator.Services.Interfaces
+namespace ModbusCommunicator.Services.Interfaces
 {
     public interface IMainNavigationService
     {

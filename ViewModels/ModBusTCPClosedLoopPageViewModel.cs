@@ -1,11 +1,11 @@
-﻿using NModbus;
-using PlcCommunicator.Commands;
-using PlcCommunicator.Events;
-using PlcCommunicator.Events.PrismEventAggregator;
-using PlcCommunicator.Models;
-using PlcCommunicator.Services.Configuration;
-using PlcCommunicator.Services.Interfaces;
-using PlcCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices;
+using NModbus;
+using ModbusCommunicator.Commands;
+using ModbusCommunicator.Events;
+using ModbusCommunicator.Events.PrismEventAggregator;
+using ModbusCommunicator.Models;
+using ModbusCommunicator.Services.Configuration;
+using ModbusCommunicator.Services.Interfaces;
+using ModbusCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,7 +19,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace PlcCommunicator.ViewModels
+namespace ModbusCommunicator.ViewModels
 {
     /// <summary>
     /// ModBus TCP服务页面的视图模型，处理UI和ModBus服务器之间的交互

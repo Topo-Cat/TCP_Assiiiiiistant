@@ -1,8 +1,8 @@
 using System.Windows;
-using PlcCommunicator.Services.Interfaces;
-using PlcCommunicator.Views;
+using ModbusCommunicator.Services.Interfaces;
+using ModbusCommunicator.Views;
 
-namespace PlcCommunicator
+namespace ModbusCommunicator
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑

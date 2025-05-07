@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PlcCommunicator.Views
+namespace ModbusCommunicator.Views
 {
     /// <summary>
     /// DataManagement.xaml 的交互逻辑

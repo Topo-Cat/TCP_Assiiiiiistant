@@ -1,4 +1,4 @@
-﻿// 引入 System 命名空间，提供基础类和基类型。
+// 引入 System 命名空间，提供基础类和基类型。
 using System;
 // 引入 System.Threading 命名空间，提供支持多线程编程的类。
 using System.Threading;
@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 // 定义项目的命名空间。
-namespace PlcCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices
+namespace ModbusCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices
 {
     /// <summary>
     /// 定义与 Modbus TCP 从站进行通信的主站服务接口。

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace PlcCommunicator.Converters
+namespace ModbusCommunicator.Converters
 {
     public class ToggleServerIsExecutingToText : IValueConverter
     {

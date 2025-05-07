@@ -1,5 +1,5 @@
-﻿using PlcCommunicator.Services.Interfaces;
-using PlcCommunicator.Views;
+using ModbusCommunicator.Services.Interfaces;
+using ModbusCommunicator.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace PlcCommunicator.Services.Implements
+namespace ModbusCommunicator.Services.Implements
 {
     public class MainNavigationService : IMainNavigationService
     {

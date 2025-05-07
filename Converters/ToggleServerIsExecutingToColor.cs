@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace PlcCommunicator.Converters
+namespace ModbusCommunicator.Converters
 {
     public class ToggleServerIsExecutingToColor : IValueConverter
     {

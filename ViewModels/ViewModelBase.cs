@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
+using Microsoft.Extensions.Primitives;
 using NModbus;
 using System;
 using System.Collections;
@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace PlcCommunicator.ViewModels
+namespace ModbusCommunicator.ViewModels
 {
     public class ViewModelBase : INotifyPropertyChanged, INotifyDataErrorInfo
     {

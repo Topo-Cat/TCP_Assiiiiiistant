@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlcCommunicator.Services.Configuration
+namespace ModbusCommunicator.Services.Configuration
 {
     /// <summary>
     /// 包含 Modbus TCP 主站（客户端）配置选项的类。
