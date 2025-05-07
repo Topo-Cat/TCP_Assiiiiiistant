@@ -12,6 +12,7 @@ using NModbus;
 using Microsoft.Extensions.Logging;
 using PlcCommunicator.Services.Configuration;
 using System.Diagnostics;
+using PlcCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices;
 
 namespace PlcCommunicator;
 
@@ -115,7 +116,7 @@ public partial class App : PrismApplication
         }
         );
 
-        containerRegistry.RegisterSingleton<IModbusConfigurationService, ModbusConfigurationService>();
+        containerRegistry.RegisterSingleton<IModbusTcpConfigurationService, ModbusConfigurationService>();
 
         containerRegistry.RegisterSingleton<IModbusFactory>(() =>
         new ModbusFactory(logger: new ConsoleModbusLogger(LoggingLevel.Warning)));

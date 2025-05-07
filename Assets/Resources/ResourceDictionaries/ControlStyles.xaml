@@ -1,0 +1,129 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:con="clr-namespace:PlcCommunicator.Converters">
+    <Style TargetType="Label">
+        <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
+    </Style>
+
+    <Style TargetType="GroupBox">
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+        <Setter Property="Padding" Value="5"/>
+        <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
+        <Setter Property="Background" Value="{StaticResource LightBackgroundColor}"/>
+    </Style>
+
+    <Style x:Key="ActionButtonStyle" TargetType="Button">
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="Margin" Value="5"/>
+        <Setter Property="MinWidth" Value="80"/>
+        <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource TextColor}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="TextBox">
+        <Setter Property="Padding" Value="5"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="{StaticResource LightBackgroundColor}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor}"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource DisabledTextColor}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="ListView">
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="{StaticResource LightBackgroundColor}"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
+        <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel"/>
+    </Style>
+
+    <Style TargetType="ListViewItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Padding" Value="5,2"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#100078D7"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#200078D7"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="LogItemStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+        <Setter Property="FontFamily" Value="Consolas"/>
+    </Style>
+
+    <Style x:Key="SentHistoryItemStyle" TargetType="TextBlock" BasedOn="{StaticResource LogItemStyle}">
+        <Setter Property="Foreground" Value="{StaticResource PrimaryColor}"/>
+    </Style>
+
+    <Style x:Key="StatusLightStyle" TargetType="Ellipse">
+        <Setter Property="Width" Value="15"/>
+        <Setter Property="Height" Value="15"/>
+        <Setter Property="StrokeThickness" Value="0"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                <Setter Property="Fill" Value="{StaticResource SuccessColor}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsRunning}" Value="False">
+                <Setter Property="Fill" Value="{StaticResource ErrorColor}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="TabControl">
+        <Setter Property="Background" Value="{StaticResource LightBackgroundColor}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="2"/>
+    </Style>
+
+    <Style TargetType="GridSplitter">
+        <Setter Property="Background" Value="{StaticResource BorderColor}"/>
+        <Setter Property="Width" Value="5"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="ShowsPreview" Value="True"/>
+        <Setter Property="ResizeBehavior" Value="PreviousAndNext"/>
+    </Style>
+
+    <Style TargetType="Expander">
+        <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="5"/>
+        <Setter Property="Margin" Value="0,5,0,5"/>
+        <Setter Property="Background" Value="{StaticResource LightBackgroundColor}"/>
+    </Style>
+
+</ResourceDictionary>

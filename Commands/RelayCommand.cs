@@ -83,7 +83,7 @@ namespace PlcCommunicator.Commands
 
         public RelayCommand(Action<object?>? execute, Func<bool>? canExecute = null) : this(execute, WrapCanExecute(canExecute)) { }
 
-        public RelayCommand(Action execute, Func<object?, bool>? canExecute = null) : this(WrapSyncAction(execute), canExecute) { }
+        public RelayCommand(Action execute, Func<object?, bool>? canExecute) : this(WrapSyncAction(execute), canExecute) { }
 
         public RelayCommand(Action<object?>? execute, Func<object?, bool>? canExecute = null)
         {

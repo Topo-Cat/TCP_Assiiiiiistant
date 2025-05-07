@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace PlcCommunicator.Services.Implements
 {
-    public class ModbusConfigurationService : IModbusConfigurationService
+    public class ModbusConfigurationService : IModbusTcpConfigurationService
     {
         //private readonly IConfiguration _configuration;
 

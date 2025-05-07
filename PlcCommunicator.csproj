@@ -24,6 +24,7 @@
   <ItemGroup>
     <Folder Include="Events\EventArgs\" />
     <Folder Include="Converters\" />
+    <Folder Include="Services\Interfaces\ModbusTcpClosedLoopServices\" />
   </ItemGroup>
 
 </Project>

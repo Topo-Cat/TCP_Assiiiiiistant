@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 // 定义项目的命名空间。
-namespace PlcCommunicator.Services.Interfaces
+namespace PlcCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices
 {
     /// <summary>
     /// 定义与 Modbus TCP 从站进行通信的主站服务接口。

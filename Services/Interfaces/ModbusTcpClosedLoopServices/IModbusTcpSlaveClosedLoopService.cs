@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlcCommunicator.Services.Interfaces
+namespace PlcCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices
 {
     public interface IModbusTcpSlaveClosedLoopService
     {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UserControl x:Class="PlcCommunicator.Views.ModBusTCPClosedLoopPage"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:con="clr-namespace:PlcCommunicator.ValueConveter"
+        xmlns:con="clr-namespace:PlcCommunicator.Converters"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -13,154 +13,26 @@
         d:DesignHeight="700" d:DesignWidth="1000">
 
     <UserControl.Resources>
-        <!-- 常用颜色 - 保留必要的资源 -->
-        <SolidColorBrush x:Key="PrimaryColor" Color="#0078D7"/>
-        <SolidColorBrush x:Key="AccentColor" Color="#0056A3"/>
-        <SolidColorBrush x:Key="SuccessColor" Color="#4CAF50"/>
-        <SolidColorBrush x:Key="ErrorColor" Color="#F44336"/>
-        <SolidColorBrush x:Key="BorderColor" Color="#CCCCCC"/>
-        <SolidColorBrush x:Key="BackgroundColor" Color="#F4F4F4"/>
-        <SolidColorBrush x:Key="LightBackgroundColor" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="TextColor" Color="#333333"/>
-        <SolidColorBrush x:Key="LinkColor" Color="#0066CC"/>
-        <SolidColorBrush x:Key="DisabledTextColor" Color="#888888"/>
-
-        <!-- 基础样式 -->
-        <Style x:Key="BaseTextBlockStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
-            <Setter Property="TextWrapping" Value="NoWrap"/>
+        <!-- 错误提示文本样式 -->
+        <Style x:Key="ErrorTextStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource ErrorColor}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,2,0,0"/>
         </Style>
 
-        <!-- 修复 Label 样式 - 删除 BasedOn -->
-        <Style TargetType="Label">
-            <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
-        </Style>
-
-        <!-- GroupBox 样式 - 简化 -->
-        <Style TargetType="GroupBox">
-            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Margin" Value="0,0,0,10"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
-            <Setter Property="Background" Value="{StaticResource LightBackgroundColor}"/>
-        </Style>
-
-        <!-- 按钮样式 - 简化模板 -->
-        <Style x:Key="ActionButtonStyle" TargetType="Button">
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="MinWidth" Value="80"/>
-            <Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Cursor" Value="Hand"/>
+        <!-- 为TextBox添加错误验证样式触发器 -->
+        <Style x:Key="ValidatedTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
             <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource AccentColor}"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="{StaticResource TextColor}"/>
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5"/>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource ErrorColor}"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
                 </Trigger>
             </Style.Triggers>
-        </Style>
-
-        <!-- TextBox 样式 - 简化模板 -->
-        <Style TargetType="TextBox">
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="{StaticResource LightBackgroundColor}"/>
-            <Setter Property="Foreground" Value="{StaticResource TextColor}"/>
-            <Style.Triggers>
-                <Trigger Property="IsKeyboardFocused" Value="True">
-                    <Setter Property="BorderBrush" Value="{StaticResource PrimaryColor}"/>
-                </Trigger>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="{StaticResource AccentColor}"/>
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Foreground" Value="{StaticResource DisabledTextColor}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- ListView 样式 - 简化 -->
-        <Style TargetType="ListView">
-            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="{StaticResource LightBackgroundColor}"/>
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
-            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
-            <Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel"/>
-        </Style>
-
-        <!-- ListViewItem 样式 - 简化 -->
-        <Style TargetType="ListViewItem">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            <Setter Property="Padding" Value="5,2"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#100078D7"/>
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#200078D7"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- 日志和历史条目样式 -->
-        <Style x:Key="LogItemStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
-            <Setter Property="FontFamily" Value="Consolas"/>
-        </Style>
-
-        <Style x:Key="SentHistoryItemStyle" TargetType="TextBlock" BasedOn="{StaticResource LogItemStyle}">
-            <Setter Property="Foreground" Value="{StaticResource PrimaryColor}"/>
-        </Style>
-
-        <!-- 状态灯样式 -->
-        <Style x:Key="StatusLightStyle" TargetType="Ellipse">
-            <Setter Property="Width" Value="15"/>
-            <Setter Property="Height" Value="15"/>
-            <Setter Property="StrokeThickness" Value="0"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsRunning}" Value="True">
-                    <Setter Property="Fill" Value="{StaticResource SuccessColor}"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding IsRunning}" Value="False">
-                    <Setter Property="Fill" Value="{StaticResource ErrorColor}"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- TabControl 简化样式 -->
-        <Style TargetType="TabControl">
-            <Setter Property="Background" Value="{StaticResource LightBackgroundColor}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="2"/>
-        </Style>
-
-        <!-- GridSplitter 样式 -->
-        <Style TargetType="GridSplitter">
-            <Setter Property="Background" Value="{StaticResource BorderColor}"/>
-            <Setter Property="Width" Value="5"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <Setter Property="ShowsPreview" Value="True"/>
-            <Setter Property="ResizeBehavior" Value="PreviousAndNext"/>
         </Style>
 
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-
-
-
     </UserControl.Resources>
 
     <!-- 整体布局 -->
@@ -180,7 +52,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button Content="{Binding ToggleServerCommand.IsExecute}" Style="{StaticResource ActionButtonStyle}" Command="{Binding ToggleServerCommand}"/>
+                    <Button Content="{Binding ToggleServerCommand.IsExecuting, Converter={StaticResource StatusToTextConverter}}" Style="{StaticResource ActionButtonStyle}" Command="{Binding ToggleServerCommand}"/>
                     <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
                     <TextBlock Text="连接状态:" VerticalAlignment="Center" Margin="5,0"/>
                     <Ellipse Style="{StaticResource StatusLightStyle}" Margin="0,0,5,0"/>
@@ -204,7 +76,7 @@
             <!-- 上部分左右两栏内容 -->
             <Grid Grid.Row="0" Margin="10,10,10,5">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="400" MinWidth="250"/>
+                    <ColumnDefinition Width="500" MinWidth="350"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*" MinWidth="200"/>
                 </Grid.ColumnDefinitions>
@@ -213,64 +85,224 @@
                 <Grid Grid.Column="0" Margin="0,0,5,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- ModBus TCP 连接设置 -->
-                    <GroupBox Grid.Row="0" Header="ModBus TCP 连接设置" Margin="0,0,0,10">
+                    <!-- ModBus TCP 连接设置 - 重新设计布局 -->
+                    <GroupBox Grid.Row="0" Header="ModBus TCP 连接设置" Margin="0,0,0,0">
                         <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <!-- 连接参数区域 -->
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="80"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="80"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                            <!-- IP地址标签和输入框 -->
+                            <TextBlock Text="IP 地址:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,4,5,0"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource ValidatedTextBoxStyle}" 
+                                     Text="{Binding IPAddress, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                     Height="24"
+                                     Margin="0,0,10,0" 
+                                     VerticalContentAlignment="Center"/>
+                            <!-- IP地址错误信息 -->
+                            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding IPAddressError}" 
+                                       Style="{StaticResource ErrorTextStyle}"
+                                       Visibility="{Binding HasIPAddressError, Converter={StaticResource BoolToVis}}"/>
 
-                                <TextBlock Text="IP 地址:" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                <TextBox Grid.Column="1" Text="{Binding IPAddress}" Margin="0,0,10,0" 
-                                         VerticalContentAlignment="Center"/>
+                            <!-- 端口标签和输入框 -->
+                            <TextBlock Text="端口:" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Margin="0,4,5,0"/>
+                            <TextBox Grid.Row="0" Grid.Column="3" Style="{StaticResource ValidatedTextBoxStyle}" 
+                                     Text="{Binding Port, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                     Height="24"
+                                     Margin="0,0,10,0" 
+                                     VerticalContentAlignment="Center"/>
+                            <!-- 端口错误信息 -->
+                            <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding PortError}" 
+                                       Style="{StaticResource ErrorTextStyle}"
+                                       Visibility="{Binding HasPortError, Converter={StaticResource BoolToVis}}"/>
 
-                                <TextBlock Text="端口:" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                <TextBox Grid.Column="3" Text="{Binding Port}" Margin="0,0,10,0" 
-                                         VerticalContentAlignment="Center"/>
+                            <!-- 站号标签和输入框 -->
+                            <TextBlock Text="站号:" Grid.Row="0" Grid.Column="4" VerticalAlignment="Center" Margin="0,4,5,0"/>
+                            <TextBox Grid.Row="0" Grid.Column="5" Style="{StaticResource ValidatedTextBoxStyle}" 
+                                     Text="{Binding UnitId, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                     Height="24"
+                                     Margin="0,0,10,0" 
+                                     VerticalContentAlignment="Center" 
+                                     TextChanged="TextBox_TextChanged"/>
+                            <!-- 站号错误信息 -->
+                            <TextBlock Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="2" Text="{Binding SlaveIdError}" 
+                                       Style="{StaticResource ErrorTextStyle}"
+                                       Visibility="{Binding HasSlaveIdError, Converter={StaticResource BoolToVis}}"/>
 
-                                <TextBlock Text="站号:" Grid.Column="4" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                <TextBox Grid.Column="5" Text="{Binding SlaveId}" Margin="0,0,10,0" 
-                                         VerticalContentAlignment="Center"/>
-
-                                <TextBlock Grid.Column="6" Text="高级设置" VerticalAlignment="Center" 
-                                           HorizontalAlignment="Right" Margin="0,0,5,0"
-                                           Foreground="{StaticResource LinkColor}" TextDecorations="Underline" 
-                                           Cursor="Hand">
-                                    <TextBlock.InputBindings>
-                                        <MouseBinding Gesture="LeftClick"
-                                                    Command="{Binding OpenAdvancedSettingsCommand}"/>
-                                    </TextBlock.InputBindings>
-                                </TextBlock>
-                            </Grid>
-
-                            <!-- 应用按钮区域 -->
-                            <Button Grid.Row="1" Content="应用配置" 
-                                   Command="{Binding ToggleServerCommand}" 
+                            <!-- 应用按钮 -->
+                            <Button Grid.Row="0" Grid.Column="7" Content="应用配置" 
+                                   Command="{Binding SaveConfigCommand}" 
                                    Style="{StaticResource ActionButtonStyle}"
-                                   Margin="0,8,0,0"
-                                   MinWidth="110"
+                                   Width="Auto" MinWidth="80"
+                                   Height="24"
+                                   Padding="8,0"
+                                   VerticalAlignment="Top"
+                                   Margin="0,0,0,0"
                                    HorizontalAlignment="Right"/>
                         </Grid>
                     </GroupBox>
 
+                    <!-- 高级设置可折叠面板 -->
+                    <Expander Grid.Row="1" 
+                              Header="高级设置" 
+                              IsExpanded="{Binding IsAdvancedSettingsVisible}" 
+                              Margin="0,5,0,5">
+                        <ScrollViewer MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="5">
+                                <!-- 寄存器限制设置 -->
+                                <GroupBox Header="寄存器限制" Margin="0,0,0,10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- 最大线圈数 -->
+                                        <TextBlock Text="最大线圈数:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,5,5,5"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource ValidatedTextBoxStyle}"
+                                                 Text="{Binding MaxCoils, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                                 Margin="0,3,10,3" ToolTip="最大线圈数 (1-1000)" TextChanged="TextBox_TextChanged_1"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding MaxCoilsError}" 
+                                                   Style="{StaticResource ErrorTextStyle}"
+                                                   Visibility="{Binding HasMaxCoilsError, Converter={StaticResource BoolToVis}}"/>
+
+                                        <!-- 最大离散输入数 -->
+                                        <TextBlock Text="最大离散输入数:" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Margin="0,5,5,5"/>
+                                        <TextBox Grid.Row="0" Grid.Column="3" Style="{StaticResource ValidatedTextBoxStyle}"
+                                                 Text="{Binding MaxInputDiscretes, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                                 Margin="0,3,0,3" ToolTip="最大离散输入数 (1-1000)"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding MaxInputDiscretesError}" 
+                                                   Style="{StaticResource ErrorTextStyle}"
+                                                   Visibility="{Binding HasMaxInputDiscretesError, Converter={StaticResource BoolToVis}}"/>
+
+                                        <!-- 最大保持寄存器数 -->
+                                        <TextBlock Text="最大保持寄存器数:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,5,5,5"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource ValidatedTextBoxStyle}"
+                                                 Text="{Binding MaxHoldingRegisters, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                                 Margin="0,3,10,3" ToolTip="最大保持寄存器数 (1-1000)"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding MaxHoldingRegistersError}" 
+                                                   Style="{StaticResource ErrorTextStyle}"
+                                                   Visibility="{Binding HasMaxHoldingRegistersError, Converter={StaticResource BoolToVis}}"/>
+
+                                        <!-- 最大输入寄存器数 -->
+                                        <TextBlock Text="最大输入寄存器数:" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Margin="0,5,5,5"/>
+                                        <TextBox Grid.Row="2" Grid.Column="3" Style="{StaticResource ValidatedTextBoxStyle}"
+                                                 Text="{Binding MaxInputRegisters, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                                 Margin="0,3,0,3" ToolTip="最大输入寄存器数 (1-1000)"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding MaxInputRegistersError}" 
+                                                   Style="{StaticResource ErrorTextStyle}"
+                                                   Visibility="{Binding HasMaxInputRegistersError, Converter={StaticResource BoolToVis}}"/>
+                                    </Grid>
+                                </GroupBox>
+
+                                <!-- 超时和重试设置 -->
+                                <GroupBox Header="超时和重试设置" Margin="0,0,0,10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- 最大重试次数 -->
+                                        <TextBlock Text="最大重试次数:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,5,5,5"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource ValidatedTextBoxStyle}"
+                                                Text="{Binding NumberOfRetries, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                                Margin="0,3,10,3" ToolTip="设置请求失败时的最大重试次数 (范围: 1-10)"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding NumberOfRetriesError}" 
+                                                   Style="{StaticResource ErrorTextStyle}"
+                                                   Visibility="{Binding HasNumberOfRetriesError, Converter={StaticResource BoolToVis}}"/>
+
+                                        <!-- 重试延迟 -->
+                                        <TextBlock Text="重试延迟 (毫秒):" Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Margin="0,5,5,5"/>
+                                        <TextBox Grid.Row="0" Grid.Column="3" Style="{StaticResource ValidatedTextBoxStyle}"
+                                                Text="{Binding RetryDelayMilliseconds, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                                Margin="0,3,0,3" ToolTip="设置重试之间的延迟时间 (范围: 5-2000 毫秒)"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding RetryDelayMillisecondsError}" 
+                                                   Style="{StaticResource ErrorTextStyle}"
+                                                   Visibility="{Binding HasRetryDelayMillisecondsError, Converter={StaticResource BoolToVis}}"/>
+
+                                        <!-- 发送超时 -->
+                                        <TextBlock Text="发送超时 (毫秒):" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,5,5,5"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource ValidatedTextBoxStyle}"
+                                                Text="{Binding SendTimeoutMilliseconds, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                                Margin="0,3,10,3" ToolTip="设置发送请求的超时时间 (范围: 50-2000 毫秒)"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding SendTimeoutMillisecondsError}" 
+                                                   Style="{StaticResource ErrorTextStyle}"
+                                                   Visibility="{Binding HasSendTimeoutMillisecondsError, Converter={StaticResource BoolToVis}}"/>
+
+                                        <!-- 接收超时 -->
+                                        <TextBlock Text="接收超时 (毫秒):" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Margin="0,5,5,5"/>
+                                        <TextBox Grid.Row="2" Grid.Column="3" Style="{StaticResource ValidatedTextBoxStyle}"
+                                                Text="{Binding ReceiveTimeoutMilliseconds, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" 
+                                                Margin="0,3,0,3" ToolTip="设置接收响应的超时时间 (范围: 50-2000 毫秒)"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Text="{Binding ReceiveTimeoutMillisecondsError}" 
+                                                   Style="{StaticResource ErrorTextStyle}"
+                                                   Visibility="{Binding HasReceiveTimeoutMillisecondsError, Converter={StaticResource BoolToVis}}"/>
+                                    </Grid>
+                                </GroupBox>
+
+                                <!-- 其他设置 -->
+                                <GroupBox Header="其他设置" Margin="0,0,0,5">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <CheckBox Grid.Row="0" Grid.Column="0" Content="只读模式" 
+                                                IsChecked="{Binding ReadOnly}" Margin="5"
+                                                ToolTip="启用后将拒绝所有写入操作 (功能码 0x05, 0x06, 0x0F, 0x10)"/>
+
+                                        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" 
+                                                  HorizontalAlignment="Right" Margin="0,5,0,0">
+                                            <Button Content="恢复默认值" Command="{Binding RestoreDefaultsCommand}" 
+                                                   Style="{StaticResource ActionButtonStyle}"/>
+                                            <Button Content="应用配置" Command="{Binding SaveConfigCommand}" 
+                                                   Style="{StaticResource ActionButtonStyle}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </GroupBox>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Expander>
+
                     <!-- 报文历史 -->
-                    <GroupBox Grid.Row="1" Header="报文历史" Margin="0">
+                    <GroupBox Grid.Row="2" Header="报文历史" Margin="0,5,0,0">
                         <ListView ItemsSource="{Binding SentMessagesHistory}" 
                                  d:ItemsSource="{d:SampleData ItemCount=5}"
                                  VirtualizingPanel.IsVirtualizing="True"
@@ -284,7 +316,7 @@
                     </GroupBox>
                 </Grid>
 
-                <!-- 分隔条 - 确保正确工作 -->
+                <!-- 分隔条 -->
                 <GridSplitter Grid.Column="1" 
                              Width="5" 
                              HorizontalAlignment="Center" 
@@ -304,7 +336,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <!-- 日志列表 - 使用虚拟化 -->
+                            <!-- 日志列表 -->
                             <ListView Grid.Row="0" ItemsSource="{Binding LogMessages}" 
                                      d:ItemsSource="{d:SampleData ItemCount=5}"
                                      VirtualizingPanel.IsVirtualizing="True"

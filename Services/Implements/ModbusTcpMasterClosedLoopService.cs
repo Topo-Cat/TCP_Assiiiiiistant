@@ -7,6 +7,7 @@ using PlcCommunicator.Events.PrismEventAggregator;
 using PlcCommunicator.Models;
 using PlcCommunicator.Services.Configuration;
 using PlcCommunicator.Services.Interfaces;
+using PlcCommunicator.Services.Interfaces.ModbusTcpClosedLoopServices;
 using Polly;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace PlcCommunicator.Services.Implements
         private readonly IModbusFactory _modbusFactory; // NModbus 工厂实例，用于创建 Modbus 主站。
         private readonly TcpStatusSharedService _tcpSharedService;  // TCP 状态共享服务实例，用于与其他组件通信。
         private readonly IEventAggregator? _eventAggregator; // 事件聚合器实例，用于发布和订阅跨组件的事件。可为 null。
-        private readonly IModbusConfigurationService _configurationService;
+        private readonly IModbusTcpConfigurationService _configurationService;
 
         // --- 动态的私有字段 (受配置影响) --- // 区域注释：受配置选项影响的字段。
         private ModbusTcpClosedLoopOptions CurrentOptions => _configurationService.GetClosedLoopConfig();
@@ -51,7 +52,7 @@ namespace PlcCommunicator.Services.Implements
         public bool IsConnected => _tcpClient?.Connected ?? false && _master != null; // 判断 TCP 客户端是否连接且 Modbus 主站实例存在
 
         public ModbusTcpMasterClosedLoopService(ILogger<ModbusTcpClosedLoopOptions> logger,
-            IModbusConfigurationService configurationService,
+            IModbusTcpConfigurationService configurationService,
             IModbusFactory modbusFactory, TcpStatusSharedService tcpSharedService,
             IEventAggregator eventAggregator
             )
@@ -194,6 +195,9 @@ namespace PlcCommunicator.Services.Implements
 
                     await _tcpClient.ConnectAsync(address, port, ct).ConfigureAwait(false); // 使用 CancellationToken
                     _logger.LogDebug("TCP 连接成功。");
+
+                    _eventAggregator?.GetEvent<ClosedLoopStatusChangedEvent>().Publish(true);
+
                 }, token).ConfigureAwait(false); // 将 CancellationToken 传递给 Polly
 
                 // 检查 Polly 执行结果
@@ -384,7 +388,7 @@ namespace PlcCommunicator.Services.Implements
         // --- 服务配置 ---
         private ModbusTcpClosedLoopOptions _currentOptions => _configurationService.GetClosedLoopConfig(); // 当前生效的配置
         private readonly ILogger _logger;
-        private readonly IModbusConfigurationService _configurationService;
+        private readonly IModbusTcpConfigurationService _configurationService;
         private readonly TcpStatusSharedService _tcpSharedService;
         private readonly IEventAggregator _eventAggregator;
         private readonly IDisposable? _optionsChangeListener; // 用于取消注册
@@ -409,7 +413,7 @@ namespace PlcCommunicator.Services.Implements
         #endregion
 
         public ModbusTcpSlaveClosedLoopService(ILogger<ModbusTcpClosedLoopOptions> logger,
-            IModbusConfigurationService configurationService,
+            IModbusTcpConfigurationService configurationService,
             IModbusFactory modbusFactory, 
             TcpStatusSharedService tcpSharedService,
             IEventAggregator eventAggregator)
@@ -721,10 +725,10 @@ namespace PlcCommunicator.Services.Implements
             {
                 if (!_isRunning)
                 {
-                    Debug.WriteLine("InitializeDataStoreStandaloneAsync: 服务未运行，无法执行独立初始化。");
-                    throw new InvalidOperationException("服务当前未运行，无法初始化数据存储区。");
+                    Debug.WriteLine("InitializeDataStoreStandaloneAsync: 服务正在运行，无法执行独立初始化。");
+                    throw new InvalidOperationException("服务当前正在运行，无法初始化数据存储区。");
                 }
-                Debug.WriteLine("InitializeDataStoreStandaloneAsync: 服务运行中，准备调用内部初始化逻辑 (强制重置)...");
+                Debug.WriteLine("InitializeDataStoreStandaloneAsync: 准备调用内部初始化逻辑 (强制重置)...");
 
                 await InitializeDataStoreInternalAsync(true); // 调用内部初始化逻辑，传入 true 表示强制重置
                 Debug.WriteLine("InitializeDataStoreStandaloneAsync: 内部初始化逻辑已完成。");
@@ -744,7 +748,12 @@ namespace PlcCommunicator.Services.Implements
 
         private async Task InitializeDataStoreInternalAsync(bool forceReset = false)
         {
-            InitializeDataStoreStandaloneAsync();
+            //InitializeDataStoreStandaloneAsync();
+            var MaxCoils = _currentOptions.MaxCoils;
+            var MaxInputDiscretes = _currentOptions.MaxInputDiscretes;
+            var MaxHoldingRegisters = _currentOptions.MaxHoldingRegisters;
+            var MaxInputRegisters = _currentOptions.MaxInputRegisters;
+
             try
             {
                 if (_slaveDataStore == null)
@@ -759,17 +768,17 @@ namespace PlcCommunicator.Services.Implements
                 }
                 try
                 {
-                    //_coilLock.EnterWriteLock();
-                    //try { _slaveDataStore.CoilDiscretes.WritePoints(1, new bool[MaxCoils]); Debug.WriteLine("线圈初始化完成。"); } finally { _coilLock.ExitWriteLock(); }
+                    _coilLock.EnterWriteLock();
+                    try { _slaveDataStore.CoilDiscretes.WritePoints(1, new bool[MaxCoils]); Debug.WriteLine("线圈初始化完成。"); } finally { _coilLock.ExitWriteLock(); }
 
-                    //_inputDiscreteLock.EnterWriteLock();
-                    //try { _slaveDataStore.CoilInputs.WritePoints(1, new bool[MaxInputDiscretes]); Debug.WriteLine("只读线圈初始化完成。"); } finally { _inputDiscreteLock.ExitWriteLock(); }
+                    _inputDiscreteLock.EnterWriteLock();
+                    try { _slaveDataStore.CoilInputs.WritePoints(1, new bool[MaxInputDiscretes]); Debug.WriteLine("只读线圈初始化完成。"); } finally { _inputDiscreteLock.ExitWriteLock(); }
 
-                    //_holdingRegisterLock.EnterWriteLock();
-                    //try { _slaveDataStore.HoldingRegisters.WritePoints(1, new ushort[MaxHoldingRegisters]); Debug.WriteLine("保持寄存器初始化完成。"); } finally { _holdingRegisterLock.ExitWriteLock(); }
+                    _holdingRegisterLock.EnterWriteLock();
+                    try { _slaveDataStore.HoldingRegisters.WritePoints(1, new ushort[MaxHoldingRegisters]); Debug.WriteLine("保持寄存器初始化完成。"); } finally { _holdingRegisterLock.ExitWriteLock(); }
 
-                    //_inputRegisterLock.EnterWriteLock();
-                    //try { _slaveDataStore.InputRegisters.WritePoints(1, new ushort[MaxInputRegisters]); Debug.WriteLine("线圈初始化完成。"); } finally { _inputRegisterLock.ExitWriteLock(); }
+                    _inputRegisterLock.EnterWriteLock();
+                    try { _slaveDataStore.InputRegisters.WritePoints(1, new ushort[MaxInputRegisters]); Debug.WriteLine("线圈初始化完成。"); } finally { _inputRegisterLock.ExitWriteLock(); }
 
                     Debug.WriteLine("InitializeDataStoreInternalAsync: Modbus 数据存储区所有区域初始化/清零完成。");
                 }

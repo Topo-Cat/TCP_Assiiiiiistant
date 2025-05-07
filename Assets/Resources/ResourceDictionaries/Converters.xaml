@@ -1,0 +1,7 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:con="clr-namespace:PlcCommunicator.Converters">
+    <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    <con:ToggleServerIsExecutingToColor x:Key="StatusToColorConverter"/>
+    <con:ToggleServerIsExecutingToText x:Key="StatusToTextConverter"/>
+</ResourceDictionary>

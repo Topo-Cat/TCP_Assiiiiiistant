@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PlcCommunicator.Services.Interfaces
 {
-    public interface IModbusConfigurationService
+    public interface IModbusTcpConfigurationService
     {
         // 获取闭环测试配置
         ModbusTcpClosedLoopOptions GetClosedLoopConfig();
